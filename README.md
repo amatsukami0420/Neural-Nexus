@@ -4,45 +4,43 @@ A versatile AI assistant that combines text, voice, and file input capabilities 
 
 ## Features
 
-- Multiple input modes (text, voice, file upload)
-- Integration with Google's Gemini AI
+- Text input for regular queries
+- Voice input with speech-to-text conversion
+- File upload and analysis support
+- Google Gemini AI integration
 - Real-time weather information
-- Conversation history management
-- File analysis support (images, PDFs, documents)
-- Voice input processing
+- Conversation history tracking
 
 ## Prerequisites
 
 - Python 3.8 or higher
 - Google Gemini API key (get it from [Google AI Studio](https://makersuite.google.com/app/apikey))
 - OpenWeatherMap API key (get it from [OpenWeatherMap](https://openweathermap.org/api))
+- PyAudio (required for voice input)
 
-## Security Notice
-
-This project uses environment variables for API keys. Never commit your actual `.env` file to GitHub.
+### PyAudio Installation
+- Windows: `pip install PyAudio`
+- Linux: `sudo apt-get install python3-pyaudio`
+- macOS: `brew install portaudio && pip install PyAudio`
 
 ## Installation
 
-1. Clone the repository:
+1. Clone and setup:
 ```bash
 git clone <your-repository-url>
 cd AI-HACK
-```
-
-2. Install required packages:
-```bash
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
+2. Configure environment:
 ```bash
 cp .env.sample .env
+# Edit .env with your API keys
 ```
-Then edit `.env` with your actual API keys.
 
 ## Configuration
 
-The `.env` file should contain:
+Required environment variables:
 ```plaintext
 GEMINI_API_KEY=your_gemini_api_key_here
 WEATHER_API_KEY=your_openweathermap_api_key_here
@@ -66,17 +64,17 @@ AI-HACK/
 
 ## Usage
 
-1. Start the application:
+1. Launch the app:
 ```bash
 streamlit run app.py
 ```
 
-2. Access the web interface at `http://localhost:8501`
+2. Open `http://localhost:8501`
 
-3. Choose your preferred input mode:
-   - Text: Type your message
-   - Voice: Use microphone input
-   - Upload: Share files for analysis
+3. Choose input mode:
+   - Text: Type queries
+   - Voice: Speak commands
+   - File: Upload for analysis
 
 4. For weather information, include "weather" in your query:
    Example: "What's the weather in London?"

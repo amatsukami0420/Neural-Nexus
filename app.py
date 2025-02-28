@@ -70,10 +70,17 @@ def handle_voice_input():
 async def process_message(user_input: str, file_path: str, gemini_handler: GeminiHandler, weather_handler: WeatherHandler):
     try:
         context = st.session_state.conversation_manager.get_context()
-        if "weather" in user_input.lower():
-            return weather_handler.get_weather_info(user_input)
+        
+        # Check for weather-related queries
+        if any(word in user_input.lower() for word in ['weather', 'temperature', 'forecast']):
+            response = weather_handler.get_weather_info(user_input)
         else:
-            return await gemini_handler.generate_response(user_input, file_path, context)
+            response = await gemini_handler.generate_response(user_input, file_path, context)
+            
+        if not response:  # Fallback to Gemini if weather handler fails
+            response = await gemini_handler.generate_response(user_input, file_path, context)
+            
+        return response
     except Exception as e:
         logger.error(f"Error processing message: {str(e)}")
         return f"An error occurred: {str(e)}"
@@ -85,6 +92,24 @@ def validate_api_keys():
         raise ValueError("WEATHER_API_KEY is not set in .env file")
 
 def main():
+    # Add custom CSS for chat UI
+    st.markdown("""
+        <style>
+        .stTextInput > div > div > input {
+            border-color: #28a745 !important;
+        }
+        .stTextInput > div > div > input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+        }
+        div.stChatMessage {
+            border-color: #28a745 !important;
+        }
+        div.stChatMessage:hover {
+            border-color: #218838 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
     st.title("Multimodal AI Assistant")
     
     try:

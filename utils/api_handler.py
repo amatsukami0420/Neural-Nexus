@@ -28,17 +28,29 @@ class GeminiHandler:
 
     async def generate_response(self, prompt: str, file_path: str = None, context: list = None) -> str:
         try:
-            if not context:
-                context = []
+            # Check for weather-related queries first
+            if any(word in prompt.lower() for word in ['weather', 'temperature', 'forecast']):
+                return None  # Let the WeatherHandler handle it
             
+            # Format the prompt with context
+            if context:
+                formatted_context = "Previous conversation:\n"
+                for msg in context[-20:]:  # Last 20 messages
+                    role = "User" if msg["role"] == "user" else "Assistant"
+                    formatted_context += f"{role}: {msg['content']}\n"
+                
+                full_prompt = f"{formatted_context}\nUser: {prompt}\nAssistant:"
+            else:
+                full_prompt = prompt
+
             if file_path:
                 content = self._process_file_input(file_path)
                 if isinstance(content, Image.Image):
-                    response = self.model.generate_content([prompt, content])
+                    response = self.model.generate_content([full_prompt, content])
                 else:
-                    response = self.model.generate_content([prompt, str(content)])
+                    response = self.model.generate_content([full_prompt, str(content)])
             else:
-                response = self.model.generate_content(prompt, generation_config=None)
+                response = self.model.generate_content(full_prompt, generation_config=None)
             
             return response.text
         except Exception as e:
@@ -70,12 +82,22 @@ class WeatherHandler:
             raise
             
     def _extract_city(self, query: str) -> str:
-        words = query.lower().split()
-        try:
-            idx = words.index("in")
-            return " ".join(words[idx + 1:])
-        except ValueError:
-            return " ".join(words[-1:])
+        # Improved city extraction logic
+        query = query.lower()
+        
+        # Common weather query patterns
+        if "weather in" in query:
+            return query.split("weather in")[-1].strip()
+        if "temperature in" in query:
+            return query.split("temperature in")[-1].strip()
+        if "how's the weather in" in query:
+            return query.split("how's the weather in")[-1].strip()
+        if "what's the weather in" in query:
+            return query.split("what's the weather in")[-1].strip()
+        
+        # Default to last word if no pattern matches
+        words = query.split()
+        return words[-1]
             
     def _format_weather_response(self, data: Dict[str, Any]) -> str:
         return (f"Weather in {data['name']}: {data['weather'][0]['description']}. "

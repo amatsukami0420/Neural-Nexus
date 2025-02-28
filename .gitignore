@@ -37,3 +37,13 @@ ENV/
 .vscode/
 *.swp
 *.swo
+
+# Google Cloud credentials
+**/gen-lang-client*.json
+*.pem
+**/service-account*.json
+
+# General credential files
+**/*.key
+**/*.keystore
+**/*.p12
